@@ -17,7 +17,21 @@ export const Transition = Node.create({
     return {
       Enter: ({ editor }) => {
         if (!editor.isActive('transition')) return false
-        return editor.chain().splitBlock().setNode('sceneHeading').run()
+        const { $from } = editor.state.selection
+        const isEmpty = $from.parent.textContent.length === 0
+        if (isEmpty) {
+          return editor.chain().setNode('action').run()
+        }
+        // Transition → Scene Heading (single undo step)
+        return editor.commands.command(({ tr, dispatch }) => {
+          if (!dispatch) return true
+          const { $from } = tr.selection
+          tr.split($from.pos)
+          const newPos = tr.mapping.map($from.pos)
+          const $new = tr.doc.resolve(newPos)
+          tr.setNodeMarkup($new.before($new.depth), editor.schema.nodes.sceneHeading)
+          return true
+        })
       },
     }
   },

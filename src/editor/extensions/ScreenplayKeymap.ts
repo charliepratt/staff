@@ -2,15 +2,18 @@ import { Extension } from '@tiptap/core'
 import type { ScreenplayElement } from '../../formats/screenplay/extensions'
 
 /**
- * Tab cycling order — matches industry convention (Final Draft, Fade In, Arc Studio):
- * Action → Character → Scene Heading → Transition → back to Action
+ * Tab cycling order — matches industry convention:
+ * Action → Character → Parenthetical → Scene Heading → Transition → Action
  *
- * This is the order when pressing Tab on an empty or current-element line.
+ * Special case: Tab after Character → Parenthetical (Final Draft convention)
+ * This lets writers quickly add a wryly after naming a character.
+ *
  * Shift+Tab goes in reverse.
  */
 const TAB_CYCLE: ScreenplayElement[] = [
   'action',
   'character',
+  'parenthetical',
   'sceneHeading',
   'transition',
 ]
@@ -23,8 +26,8 @@ function getCurrentElement(editor: { isActive: (name: string) => boolean }): Scr
 function cycleElement(current: ScreenplayElement | null, reverse: boolean): ScreenplayElement {
   const idx = current ? TAB_CYCLE.indexOf(current) : -1
   if (idx === -1) {
-    // Not in cycle (e.g. dialogue, parenthetical) — jump to action
-    return 'action'
+    // Not in cycle (e.g. dialogue) — jump to character (most likely next need)
+    return 'character'
   }
   if (reverse) {
     return TAB_CYCLE[(idx - 1 + TAB_CYCLE.length) % TAB_CYCLE.length]!
@@ -80,7 +83,6 @@ export const ScreenplayKeymap = Extension.create({
     if (node.type.name !== 'action') return
 
     if (SCENE_HEADING_PATTERN.test(text)) {
-      // Defer to avoid conflicting with the current transaction
       requestAnimationFrame(() => {
         editor.chain().setNode('sceneHeading').run()
       })
