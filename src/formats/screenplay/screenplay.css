@@ -60,34 +60,19 @@
 }
 
 /*
- * Pagination break — widget decoration inserted into the document flow.
- * Content stops before this, resumes after it.
- *
- * The spacer height = bottom margin + gap + top margin.
- * The dashed line sits centered vertically, spanning the full 816px page width.
+ * Pagination break lines — absolutely positioned on .screenplay-page.
+ * Separate from the spacer widgets (which are blank divs in the
+ * editor's content flow). This avoids ProseMirror wrapper issues.
  */
-.pagination-break {
-  user-select: none;
-  pointer-events: none;
-  /* 816px page width, centered by pulling back past the editor padding */
-  width: 816px;
-  margin-left: -144px;
-  position: relative;
-}
-
-/* The dashed line — centered vertically in the spacer, full width */
 .pagination-break-line {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 0;
+  pointer-events: none;
+  z-index: 5;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* The dashed line itself */
+/* The dashed line — spans the full width via pseudo-element */
 .pagination-break-line::before {
   content: '';
   position: absolute;
@@ -100,9 +85,12 @@
     0 -1px 4px rgba(61, 90, 128, 0.07);
 }
 
-/* Page number — dead center on the line */
+/* Page number — absolutely centered on the 816px page */
 .pagination-break-number {
-  position: relative;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   z-index: 1;
   font-family: var(--screenplay-font);
   font-size: 9pt;
