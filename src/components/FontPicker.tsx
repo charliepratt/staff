@@ -24,12 +24,12 @@ export function FontPicker({ selected, onSelect }: FontPickerProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer text-text-2 hover:bg-surface-2 hover:text-text-1">
-          <span style={{ fontFamily: selected.family }} className="text-sm">
+        <button className="flex items-center gap-2 px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer text-text-2 hover:bg-surface-3 hover:text-text-1 w-[160px] md:w-[160px] w-auto" title={selected.name}>
+          <span style={{ fontFamily: selected.family }} className="text-sm shrink-0">
             Aa
           </span>
-          <span>{selected.name}</span>
-          <ChevronDown size={12} className="opacity-50" />
+          <span className="hidden md:inline truncate flex-1 text-left">{selected.name}</span>
+          <ChevronDown size={10} className="opacity-50 shrink-0" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="min-w-[280px] max-h-[420px] overflow-y-auto">
