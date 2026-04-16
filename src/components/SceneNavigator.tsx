@@ -41,7 +41,10 @@ function extractScenes(editor: Editor): Scene[] {
 export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNavigatorProps) {
   const [scenes, setScenes] = useState<Scene[]>([])
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [width, setWidth] = useState(DEFAULT_WIDTH)
+  const [width, setWidth] = useState(() => {
+    const saved = localStorage.getItem('nav-width')
+    return saved ? parseInt(saved, 10) : DEFAULT_WIDTH
+  })
   const [isDragging, setIsDragging] = useState(false)
   const [activePos, setActivePos] = useState<number | null>(null)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -70,6 +73,10 @@ export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNaviga
 
     const onMouseUp = () => {
       setIsDragging(false)
+      const el = panelRef.current
+      if (el) {
+        localStorage.setItem('nav-width', String(Math.round(parseFloat(el.style.width))))
+      }
       document.removeEventListener('mousemove', onMouseMove)
       document.removeEventListener('mouseup', onMouseUp)
     }
@@ -187,10 +194,12 @@ export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNaviga
         {open && (
           <div
             onMouseDown={startDrag}
-            className={`absolute top-0 right-0 bottom-0 w-1 cursor-col-resize transition-colors hover:bg-accent/30 ${
-              isDragging ? 'bg-accent/30' : ''
-            }`}
-          />
+            className="absolute top-0 -right-2 bottom-0 w-4 cursor-col-resize group"
+          >
+            <div className={`absolute top-0 right-2 bottom-0 w-px transition-all duration-200 group-hover:w-1 group-hover:bg-border-2 ${
+              isDragging ? 'w-1 bg-border-2' : ''
+            }`} />
+          </div>
         )}
       </div>
 
