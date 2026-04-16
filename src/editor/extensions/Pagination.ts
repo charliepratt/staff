@@ -10,7 +10,7 @@ export interface PaginationOptions {
   debounceMs: number
 }
 
-const paginationPluginKey = new PluginKey('pagination')
+export const paginationPluginKey = new PluginKey('pagination')
 
 export const Pagination = Extension.create<PaginationOptions>({
   name: 'pagination',
@@ -36,25 +36,36 @@ export const Pagination = Extension.create<PaginationOptions>({
 
         state: {
           init() {
-            return DecorationSet.empty
+            return { decorations: DecorationSet.empty, pageCount: 1 }
           },
-          apply(tr, decorations) {
-            const meta = tr.getMeta(paginationPluginKey) as DecorationSet | undefined
+          apply(tr, value, _oldState, newState) {
+            const meta = tr.getMeta(paginationPluginKey) as
+              | { decorations: DecorationSet; pageCount: number }
+              | undefined
             if (meta) return meta
-            if (tr.docChanged) return decorations.map(tr.mapping, tr.doc)
-            return decorations
+            if (tr.docChanged) {
+              return {
+                ...value,
+                decorations: value.decorations.map(tr.mapping, newState.doc),
+              }
+            }
+            return value
           },
         },
 
         props: {
           decorations(state) {
-            return paginationPluginKey.getState(state) as DecorationSet
+            const pluginState = paginationPluginKey.getState(state) as
+              | { decorations: DecorationSet; pageCount: number }
+              | undefined
+            return pluginState?.decorations ?? DecorationSet.empty
           },
         },
 
         view(editorView) {
           let debounceTimer: ReturnType<typeof setTimeout> | undefined
           let rafId = 0
+          let lastScrollHeight = 0
 
           function createBreakWidget(pageNumber: number): HTMLElement {
             const spacer = document.createElement('div')
@@ -74,13 +85,13 @@ export const Pagination = Extension.create<PaginationOptions>({
             return spacer
           }
 
-          function recalculate() {
+          function recalculate(pass = 1) {
             const dom = editorView.dom
             const children = Array.from(dom.children) as HTMLElement[]
             if (children.length === 0) return
 
-            // Walk block nodes, measure heights (skip our spacer widgets),
-            // find where page breaks need to go
+            // Walk block nodes using offsetTop for position (local coords,
+            // immune to zoom transform). Track cumulative content per page.
             let contentOnPage = 0
             const breakPositions: { pos: number; pageNum: number }[] = []
             let pageNum = 1
@@ -88,10 +99,11 @@ export const Pagination = Extension.create<PaginationOptions>({
             for (const child of children) {
               if (child.classList.contains('pagination-break')) continue
 
+              // Use offsetTop relative to editor to get true position
+              // offsetHeight gives the element's own height in local coords
               const h = child.offsetHeight
 
               if (contentOnPage + h > pageContent && contentOnPage > 0) {
-                // This block overflows the page — break before it
                 try {
                   const pos = editorView.posAtDOM(child, 0)
                   if (pos > 0) {
@@ -99,7 +111,7 @@ export const Pagination = Extension.create<PaginationOptions>({
                     breakPositions.push({ pos, pageNum })
                   }
                 } catch {
-                  // posAtDOM can throw if the node isn't in the doc
+                  // posAtDOM can throw if node isn't in doc
                 }
                 contentOnPage = h
               } else {
@@ -107,8 +119,9 @@ export const Pagination = Extension.create<PaginationOptions>({
               }
             }
 
-            // Update page container height to always show full pages
             const totalPages = breakPositions.length + 1
+
+            // Update page container height to show full pages
             const pageContainer = dom.closest('.screenplay-page') as HTMLElement | null
             if (pageContainer) {
               const totalHeight =
@@ -130,22 +143,38 @@ export const Pagination = Extension.create<PaginationOptions>({
               decorations,
             )
 
-            const tr = editorView.state.tr.setMeta(paginationPluginKey, decorationSet)
+            const tr = editorView.state.tr.setMeta(paginationPluginKey, {
+              decorations: decorationSet,
+              pageCount: totalPages,
+            })
             tr.setMeta('addToHistory', false)
-            tr.setMeta('pagination-update', true)
             editorView.dispatch(tr)
+
+            // Stabilization: after applying decorations, check if a second
+            // pass produces the same result. Cap at 2 passes.
+            if (pass < 2) {
+              requestAnimationFrame(() => {
+                const newScrollHeight = dom.scrollHeight
+                if (newScrollHeight !== lastScrollHeight) {
+                  lastScrollHeight = newScrollHeight
+                  recalculate(pass + 1)
+                }
+              })
+            }
+
+            lastScrollHeight = dom.scrollHeight
           }
 
           function scheduleRecalculate() {
             clearTimeout(debounceTimer)
             debounceTimer = setTimeout(() => {
               cancelAnimationFrame(rafId)
-              rafId = requestAnimationFrame(recalculate)
+              rafId = requestAnimationFrame(() => recalculate(1))
             }, opts.debounceMs)
           }
 
           const initTimer = setTimeout(() => {
-            recalculate()
+            recalculate(1)
             document.fonts.ready.then(scheduleRecalculate)
           }, 150)
 
@@ -153,7 +182,15 @@ export const Pagination = Extension.create<PaginationOptions>({
 
           return {
             update(view, prevState) {
+              // Recalculate on doc change
               if (view.state.doc !== prevState.doc) {
+                scheduleRecalculate()
+                return
+              }
+              // Also recalculate if scrollHeight changed (font switch, etc.)
+              const currentHeight = view.dom.scrollHeight
+              if (currentHeight !== lastScrollHeight) {
+                lastScrollHeight = currentHeight
                 scheduleRecalculate()
               }
             },

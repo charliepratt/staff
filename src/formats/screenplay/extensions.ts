@@ -6,6 +6,7 @@ import { Parenthetical } from '../../editor/extensions/Parenthetical'
 import { Transition } from '../../editor/extensions/Transition'
 import { ScreenplayKeymap } from '../../editor/extensions/ScreenplayKeymap'
 import { Pagination } from '../../editor/extensions/Pagination'
+import { SceneFlash } from '../../editor/extensions/SceneFlash'
 
 export const screenplayExtensions = [
   SceneHeading,
@@ -16,6 +17,7 @@ export const screenplayExtensions = [
   Transition,
   ScreenplayKeymap,
   Pagination,
+  SceneFlash,
 ]
 
 export type ScreenplayElement =

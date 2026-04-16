@@ -1,19 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Editor } from '@tiptap/react'
+import { paginationPluginKey } from './extensions/Pagination'
 
 export interface DocumentStats {
   wordCount: number
   pageCount: number
   runtime: string
 }
-
-/**
- * Counts all words in the document (total, including scene headings,
- * character names, etc. — this matches Final Draft's behavior).
- *
- * Page count is derived from content height vs. page content area (864px).
- * Runtime estimate: 1 page ≈ 1 minute (industry standard).
- */
 
 function countWords(editor: Editor): number {
   const text = editor.state.doc.textContent
@@ -23,11 +16,10 @@ function countWords(editor: Editor): number {
 
 function getPageCount(editor: Editor): number {
   try {
-    const dom = editor.view.dom as HTMLElement
-    const contentHeight = dom.scrollHeight
-    // Page content area: 1056px total - 96px top margin - 96px bottom margin = 864px
-    const pageContentHeight = 864
-    return Math.max(1, Math.ceil(contentHeight / pageContentHeight))
+    const pluginState = paginationPluginKey.getState(editor.state) as
+      | { pageCount: number }
+      | undefined
+    return pluginState?.pageCount ?? 1
   } catch {
     return 1
   }
@@ -64,16 +56,15 @@ export function useDocumentStats(editor: Editor | null): DocumentStats {
   useEffect(() => {
     if (!editor) return
 
-    // Initial calculation after mount
-    const timer = setTimeout(recalculate, 150)
+    const timer = setTimeout(recalculate, 200)
 
     editor.on('update', recalculate)
-    window.addEventListener('resize', recalculate)
+    editor.on('transaction', recalculate)
 
     return () => {
       clearTimeout(timer)
       editor.off('update', recalculate)
-      window.removeEventListener('resize', recalculate)
+      editor.off('transaction', recalculate)
     }
   }, [editor, recalculate])
 
