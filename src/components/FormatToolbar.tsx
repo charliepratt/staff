@@ -64,7 +64,7 @@ export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, 
       </Tooltip>
       <div className="w-px h-6 bg-border-1 mx-2" />
       {/* Undo / Redo */}
-      <Tooltip content="Undo (\u2318Z)">
+      <Tooltip content="Undo (⌘Z)">
         <button
           onClick={() => editor.chain().focus().undo().run()}
           disabled={!editor.can().undo()}
@@ -74,7 +74,7 @@ export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, 
           <Undo2 size={15} />
         </button>
       </Tooltip>
-      <Tooltip content="Redo (\u2318\u21E7Z)">
+      <Tooltip content="Redo (⌘⇧Z)">
         <button
           onClick={() => editor.chain().focus().redo().run()}
           disabled={!editor.can().redo()}
@@ -109,13 +109,27 @@ export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, 
           )
         })}
       </div>
-      <div className="ml-auto flex items-center gap-3">
-        <Tooltip content={`${wordCount.toLocaleString()} words \u00b7 ${pageCount} ${pageCount === 1 ? 'page' : 'pages'}`}>
-          <span className="text-xs text-text-2 tabular-nums cursor-default hidden sm:inline">
-            {wordCount.toLocaleString()} words &middot; ~{runtime}
-          </span>
-        </Tooltip>
-        <div className="w-px h-5 bg-border-1" />
+      <div className="ml-auto flex items-center gap-2">
+        <div className="hidden sm:flex items-center gap-0.5 text-xs tabular-nums">
+          <Tooltip content={`${wordCount.toLocaleString()} total words`}>
+            <span className="text-text-2 cursor-default px-1.5 py-0.5 rounded hover:bg-surface-3 transition-colors">
+              {wordCount.toLocaleString()} <span className="text-text-3">words</span>
+            </span>
+          </Tooltip>
+          <span className="text-text-3">/</span>
+          <Tooltip content={`${pageCount} ${pageCount === 1 ? 'page' : 'pages'}`}>
+            <span className="text-text-2 cursor-default px-1.5 py-0.5 rounded hover:bg-surface-3 transition-colors">
+              {pageCount} <span className="text-text-3">{pageCount === 1 ? 'pg' : 'pgs'}</span>
+            </span>
+          </Tooltip>
+          <span className="text-text-3">/</span>
+          <Tooltip content="Screen time">
+            <span className="text-text-2 cursor-default px-1.5 py-0.5 rounded hover:bg-surface-3 transition-colors">
+              {runtime}
+            </span>
+          </Tooltip>
+        </div>
+        <div className="w-px h-5 bg-border-1 ml-1" />
         <ZoomControl zoom={zoom} onZoomChange={onZoomChange} />
       </div>
     </div>

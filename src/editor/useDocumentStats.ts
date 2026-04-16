@@ -19,19 +19,23 @@ function getPageCount(editor: Editor): number {
     const pluginState = paginationPluginKey.getState(editor.state) as
       | { pageCount: number }
       | undefined
-    return pluginState?.pageCount ?? 1
+    if (pluginState && pluginState.pageCount > 0) {
+      return pluginState.pageCount
+    }
+    // Fallback: estimate from editor content height
+    const dom = editor.view.dom as HTMLElement
+    const contentHeight = dom.scrollHeight - 192 // subtract top+bottom padding
+    return Math.max(1, Math.ceil(contentHeight / 864))
   } catch {
     return 1
   }
 }
 
 function formatRuntime(pages: number): string {
-  const minutes = pages
-  if (minutes < 60) {
-    return `${minutes} min`
-  }
-  const hrs = Math.floor(minutes / 60)
-  const mins = minutes % 60
+  if (pages <= 1) return '1 min'
+  if (pages < 60) return `${pages} min`
+  const hrs = Math.floor(pages / 60)
+  const mins = pages % 60
   if (mins === 0) return `${hrs}h`
   return `${hrs}h ${mins}m`
 }
@@ -56,7 +60,8 @@ export function useDocumentStats(editor: Editor | null): DocumentStats {
   useEffect(() => {
     if (!editor) return
 
-    const timer = setTimeout(recalculate, 200)
+    // Delay initial calculation to let pagination settle
+    const timer = setTimeout(recalculate, 500)
 
     editor.on('update', recalculate)
     editor.on('transaction', recalculate)
