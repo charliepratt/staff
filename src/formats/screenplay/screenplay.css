@@ -231,6 +231,29 @@
   text-align: right;
 }
 
+/* Inline-editable title page fields */
+.title-page-editable {
+  outline: none;
+  border-radius: 3px;
+  transition: background-color 0.15s ease;
+  cursor: text;
+  min-width: 40px;
+}
+
+.title-page-editable:hover {
+  background-color: rgba(61, 90, 128, 0.04);
+}
+
+.title-page-editable:focus {
+  background-color: rgba(61, 90, 128, 0.06);
+}
+
+.title-page-editable:empty::before {
+  content: attr(data-placeholder);
+  color: #c8c4be;
+  pointer-events: none;
+}
+
 /*
  * Scene flash — ProseMirror node decoration class applied to a
  * scene heading when jumping to it from the navigator.
