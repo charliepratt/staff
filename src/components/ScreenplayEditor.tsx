@@ -91,9 +91,10 @@ interface ScreenplayEditorProps {
   onZoomChange: (zoom: number) => void
   navOpen: boolean
   onNavToggle: () => void
+  onTitleChange: (title: string) => void
 }
 
-export function ScreenplayEditor({ zoom, onZoomChange, navOpen, onNavToggle }: ScreenplayEditorProps) {
+export function ScreenplayEditor({ zoom, onZoomChange, navOpen, onNavToggle, onTitleChange }: ScreenplayEditorProps) {
   const { save, saveNow, load } = useAutoSave(DOCUMENT_ID)
   const [initialContent, setInitialContent] = useState(defaultContent)
   const [loaded, setLoaded] = useState(false)
@@ -108,17 +109,21 @@ export function ScreenplayEditor({ zoom, onZoomChange, navOpen, onNavToggle }: S
       }
       if (saved.titlePage) {
         setTitlePage(saved.titlePage)
+        onTitleChange(saved.titlePage.title)
+      } else {
+        onTitleChange(defaultTitlePage.title)
       }
       setLoaded(true)
     })
-  }, [load])
+  }, [load, onTitleChange])
 
   const handleTitlePageChange = useCallback(
     (tp: TitlePageData) => {
       setTitlePage(tp)
+      onTitleChange(tp.title)
       save(defaultContent, tp)
     },
-    [save],
+    [save, onTitleChange],
   )
 
   const editor = useEditor(

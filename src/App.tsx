@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { TooltipProvider } from './ui/Tooltip'
 import { ScreenplayEditor } from './components/ScreenplayEditor'
 import { KeyboardShortcuts } from './components/KeyboardShortcuts'
-import { PenLine } from 'lucide-react'
 
 const ZOOM_STEPS = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
 const DEFAULT_ZOOM = 1.25
@@ -10,6 +9,7 @@ const DEFAULT_ZOOM = 1.25
 export default function App() {
   const [zoom, setZoom] = useState(DEFAULT_ZOOM)
   const [navOpen, setNavOpen] = useState(true)
+  const [docTitle, setDocTitle] = useState('')
 
   const toggleNav = useCallback(() => {
     setNavOpen((v) => !v)
@@ -63,11 +63,16 @@ export default function App() {
     <TooltipProvider delayDuration={300}>
       <div className="flex flex-col h-full bg-surface-1 overflow-hidden">
         <header className="flex items-center justify-between px-4 py-2.5 border-b border-border-1 bg-surface-1">
-          <div className="flex items-center gap-2">
-            <PenLine size={18} className="text-accent" />
+          <div className="flex items-baseline gap-3">
             <h1 className="text-base font-semibold tracking-tight text-text-1">
               TypeyTypey
             </h1>
+            {docTitle && (
+              <>
+                <span className="text-text-3 text-sm">/</span>
+                <span className="text-sm text-text-2 truncate max-w-[300px]">{docTitle}</span>
+              </>
+            )}
           </div>
           <KeyboardShortcuts />
         </header>
@@ -77,6 +82,7 @@ export default function App() {
             onZoomChange={setZoom}
             navOpen={navOpen}
             onNavToggle={toggleNav}
+            onTitleChange={setDocTitle}
           />
         </main>
       </div>
