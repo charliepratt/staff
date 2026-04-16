@@ -3,10 +3,8 @@
  * US Letter page: 8.5" x 11" (816px x 1056px at 96dpi)
  * Standard margins: 1.5" left, 1" right, 1" top/bottom
  *
- * Pages are fixed-height (1056px each). The container snaps to
- * N full pages so the last page always shows at full size even
- * if mostly empty. Page breaks insert a 32px canvas-colored gap
- * between pages with soft shadows on each edge.
+ * All colors reference design tokens or screenplay-specific
+ * custom properties, enabling dark mode via token swap.
  */
 
 /* The scrollable canvas — ONLY scroll container, fills remaining space */
@@ -14,7 +12,19 @@
   --screenplay-zoom: 1.25;
   --screenplay-font: "Courier Prime", "Courier New", Courier, monospace;
 
-  background: #e8e6e1;
+  /* Screenplay-specific tokens (reference design system, dark mode swappable) */
+  --sp-canvas: var(--color-surface-3);
+  --sp-page: #ffffff;
+  --sp-text: var(--color-text-1);
+  --sp-text-muted: var(--color-text-3);
+  --sp-placeholder: var(--color-border-2);
+  --sp-border: var(--color-border-1);
+  --sp-accent: var(--color-accent);
+  --sp-accent-subtle: color-mix(in srgb, var(--color-accent) 7%, transparent);
+  --sp-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.05);
+  --sp-shadow-md: 0 2px 6px rgba(0, 0, 0, 0.1), 0 8px 24px rgba(0, 0, 0, 0.07);
+
+  background: var(--sp-canvas);
   flex: 1;
   min-width: 0;
   overflow-y: auto;
@@ -23,36 +33,29 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* Gap scales with zoom so it looks proportional at all levels */
   gap: calc(32px * var(--screenplay-zoom));
 }
 
 /*
  * The page container — holds the Tiptap editor.
- * min-height is set dynamically by PageBreaks to always be
- * a multiple of 1056px (full US Letter pages) + gaps.
+ * min-height is set dynamically by Pagination.ts.
  */
 .screenplay-page {
   width: 816px;
   min-height: 1056px;
-  background: white;
+  background: var(--sp-page);
   border-radius: 2px;
   position: relative;
   flex-shrink: 0;
   transform: scale(var(--screenplay-zoom));
   transform-origin: top center;
-  /* margin-bottom set dynamically by Pagination.ts to compensate for scale overflow */
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.08),
-    0 4px 16px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--sp-shadow-sm);
   transition: box-shadow 0.3s ease;
   overflow: visible;
 }
 
 .screenplay-page:hover {
-  box-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.1),
-    0 8px 24px rgba(0, 0, 0, 0.07);
+  box-shadow: var(--sp-shadow-md);
 }
 
 /* The Tiptap editor sitting inside the page */
@@ -60,7 +63,7 @@
   font-family: var(--screenplay-font);
   font-size: 12pt;
   line-height: 1.0;
-  color: #1a1a1a;
+  color: var(--sp-text);
   padding: 96px 96px 96px 144px;
   min-height: 1056px;
   overflow: visible;
@@ -68,8 +71,6 @@
 
 /*
  * Pagination break lines — absolutely positioned on .screenplay-page.
- * Separate from the spacer widgets (which are blank divs in the
- * editor's content flow). This avoids ProseMirror wrapper issues.
  */
 .pagination-break-line {
   pointer-events: none;
@@ -79,20 +80,18 @@
   justify-content: center;
 }
 
-/* The dashed line — spans the full width via pseudo-element */
 .pagination-break-line::before {
   content: '';
   position: absolute;
   left: 0;
   right: 0;
   top: 0;
-  border-top: 1px dashed #c8c4be;
+  border-top: 1px dashed var(--sp-placeholder);
   box-shadow:
-    0 1px 4px rgba(61, 90, 128, 0.07),
-    0 -1px 4px rgba(61, 90, 128, 0.07);
+    0 1px 4px var(--sp-accent-subtle),
+    0 -1px 4px var(--sp-accent-subtle);
 }
 
-/* Page number — absolutely centered on the 816px page */
 .pagination-break-number {
   position: absolute;
   left: 50%;
@@ -101,8 +100,8 @@
   z-index: 1;
   font-family: var(--screenplay-font);
   font-size: 9pt;
-  color: #b0aba4;
-  background: white;
+  color: var(--sp-text-muted);
+  background: var(--sp-page);
   padding: 2px 16px;
   border-radius: 8px;
 }
@@ -123,31 +122,27 @@
   margin-top: 0;
 }
 
-/* Empty scene heading shows a warm placeholder */
 .screenplay-scene-heading:empty::before {
   content: 'INT./EXT. LOCATION - TIME';
-  color: #c8c4be;
+  color: var(--sp-placeholder);
   pointer-events: none;
 }
 
-/* Empty action shows a gentle nudge */
 .screenplay-action:empty::before {
   content: 'Describe what we see...';
-  color: #c8c4be;
+  color: var(--sp-placeholder);
   pointer-events: none;
 }
 
-/* Empty character cue */
 .screenplay-character:empty::before {
   content: 'CHARACTER NAME';
-  color: #c8c4be;
+  color: var(--sp-placeholder);
   pointer-events: none;
 }
 
-/* Empty dialogue */
 .screenplay-dialogue:empty::before {
   content: 'What do they say?';
-  color: #c8c4be;
+  color: var(--sp-placeholder);
   pointer-events: none;
 }
 
@@ -174,7 +169,7 @@
   max-width: 2in;
   margin-top: 2px;
   margin-bottom: 2px;
-  color: #444;
+  color: var(--sp-text-muted);
   font-style: italic;
 }
 
@@ -204,19 +199,16 @@
   font-family: var(--screenplay-font);
   font-size: 12pt;
   line-height: 1.0;
-  color: #1a1a1a;
+  color: var(--sp-text);
   width: 816px;
   height: 1056px;
-  background: white;
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.08),
-    0 4px 16px rgba(0, 0, 0, 0.05);
+  background: var(--sp-page);
+  box-shadow: var(--sp-shadow-sm);
   border-radius: 2px;
   position: relative;
   flex-shrink: 0;
   transform: scale(var(--screenplay-zoom));
   transform-origin: top center;
-  /* Title page is fixed height — static compensation is fine */
   margin-bottom: calc((var(--screenplay-zoom) - 1) * 1056px);
   padding: 1in;
   box-sizing: border-box;
@@ -276,29 +268,28 @@
 }
 
 .title-page-editable:hover {
-  background-color: rgba(61, 90, 128, 0.04);
+  background-color: var(--sp-accent-subtle);
 }
 
 .title-page-editable:focus {
-  background-color: rgba(61, 90, 128, 0.06);
+  background-color: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
 
 .title-page-editable:empty::before {
   content: attr(data-placeholder);
-  color: #c8c4be;
+  color: var(--sp-placeholder);
   pointer-events: none;
 }
 
 /*
- * Scene flash — ProseMirror node decoration class applied to a
- * scene heading when jumping to it from the navigator.
+ * Scene flash — ProseMirror node decoration.
  */
 @keyframes scene-glow {
   0% {
-    background-color: rgba(61, 90, 128, 0.18);
+    background-color: color-mix(in srgb, var(--color-accent) 18%, transparent);
   }
   50% {
-    background-color: rgba(61, 90, 128, 0.10);
+    background-color: color-mix(in srgb, var(--color-accent) 10%, transparent);
   }
   100% {
     background-color: transparent;

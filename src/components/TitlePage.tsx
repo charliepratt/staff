@@ -129,6 +129,8 @@ function EditableField({
       ref={ref}
       contentEditable
       suppressContentEditableWarning
+      role="textbox"
+      aria-label={placeholder}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
       data-placeholder={placeholder}

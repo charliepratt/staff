@@ -26,7 +26,7 @@ export function FormatContextMenu({ editor, children }: FormatContextMenuProps) 
       </ContextMenu.Trigger>
       <ContextMenu.Portal>
         <ContextMenu.Content className="z-50 bg-surface-1 border border-border-1 rounded-lg shadow-lg py-1 min-w-[180px]">
-          <ContextMenu.Label className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-text-3">
+          <ContextMenu.Label className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-text-3">
             Format as...
           </ContextMenu.Label>
           {screenplayElements.map((el) => (
@@ -38,7 +38,7 @@ export function FormatContextMenu({ editor, children }: FormatContextMenuProps) 
               }`}
             >
               <span>{el.label}</span>
-              <span className="text-[11px] text-text-3 ml-4">{'\u2318'}{el.shortcut}</span>
+              <span className="text-xs text-text-3 ml-4">{'\u2318'}{el.shortcut}</span>
             </ContextMenu.Item>
           ))}
         </ContextMenu.Content>

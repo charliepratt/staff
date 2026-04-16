@@ -124,6 +124,7 @@ export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNaviga
         <Tooltip content="Close panel">
           <button
             onClick={onClose}
+            aria-label="Close scene navigator"
             className="p-1 rounded text-text-3 hover:text-text-1 hover:bg-surface-3 cursor-pointer transition-colors"
           >
             <PanelLeft size={14} />
@@ -209,6 +210,7 @@ export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNaviga
         <Tooltip content="Scenes">
           <button
             onClick={() => setMobileOpen(true)}
+            aria-label="Open scene navigator"
             className="fixed bottom-4 left-4 z-40 p-3 bg-surface-1 border border-border-1 rounded-full shadow-lg text-text-2 hover:text-text-1 cursor-pointer transition-colors"
           >
             <PanelLeft size={18} />

@@ -97,6 +97,7 @@ export function KeyboardShortcuts() {
       <Tooltip content="Keyboard shortcuts">
         <button
           onClick={() => setOpen(true)}
+          aria-label="Keyboard shortcuts"
           className="p-1.5 rounded text-text-3 hover:text-text-1 hover:bg-surface-2 cursor-pointer transition-colors"
         >
           <Keyboard size={16} />
@@ -109,11 +110,12 @@ export function KeyboardShortcuts() {
             className={`fixed inset-0 z-50 transition-opacity duration-250 ease-out ${visible ? 'bg-black/10' : 'bg-black/0'}`}
             onClick={handleClose}
           />
-          <div className={`fixed top-0 right-0 bottom-0 z-50 w-[360px] bg-surface-1 border-l border-border-1 shadow-xl flex flex-col transition-transform duration-250 ease-out ${visible ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div className={`fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[360px] bg-surface-1 border-l border-border-1 shadow-xl flex flex-col transition-transform duration-250 ease-out ${visible ? 'translate-x-0' : 'translate-x-full'}`}>
             <div className="flex items-center justify-between px-5 py-4 border-b border-border-1 shrink-0">
               <h2 className="text-base font-semibold text-text-1">Keyboard Shortcuts</h2>
               <button
                 onClick={handleClose}
+                aria-label="Close shortcuts"
                 className="p-1.5 rounded text-text-3 hover:text-text-1 hover:bg-surface-2 cursor-pointer transition-colors"
               >
                 <X size={16} />

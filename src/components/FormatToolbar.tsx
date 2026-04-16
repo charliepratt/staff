@@ -52,6 +52,7 @@ export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, 
       <Tooltip content={`Scenes (\u2318\\)`}>
         <button
           onClick={onNavToggle}
+          aria-label="Toggle scene navigator"
           className={`p-1.5 rounded-md transition-colors cursor-pointer ${
             navOpen
               ? 'bg-border-1 text-text-1'
@@ -67,6 +68,7 @@ export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, 
         <button
           onClick={() => editor.chain().focus().undo().run()}
           disabled={!editor.can().undo()}
+          aria-label="Undo"
           className="p-1.5 rounded-md transition-colors cursor-pointer text-text-2 hover:bg-surface-3 hover:text-text-1 disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <Undo2 size={15} />
@@ -76,6 +78,7 @@ export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, 
         <button
           onClick={() => editor.chain().focus().redo().run()}
           disabled={!editor.can().redo()}
+          aria-label="Redo"
           className="p-1.5 rounded-md transition-colors cursor-pointer text-text-2 hover:bg-surface-3 hover:text-text-1 disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <Redo2 size={15} />
@@ -92,6 +95,7 @@ export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, 
             <Tooltip key={el.type} content={`${el.label} (\u2318${el.shortcut})`}>
               <button
                 onClick={() => setElement(el.type)}
+                aria-label={el.label}
                 className={`flex items-center gap-1.5 px-2 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
                   isActive
                     ? 'bg-border-1 text-text-1'

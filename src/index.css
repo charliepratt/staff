@@ -17,7 +17,7 @@
   /* Text — warm charcoal hierarchy */
   --color-text-1: #2C2825;
   --color-text-2: #6B6560;
-  --color-text-3: #9C9590;
+  --color-text-3: #847D77;
 
   /* Borders — warm and subtle */
   --color-border-1: #E5E0D8;
@@ -60,13 +60,25 @@ button:active:not(:disabled) {
   transform: translateY(0.5px);
 }
 
-/* Kill all focus rings, outlines, and ring utilities globally */
-*:focus,
-*:focus-visible,
-*:focus-within {
-  outline: none !important;
-  box-shadow: none !important;
-  --tw-ring-shadow: none !important;
+/* Suppress focus rings on mouse click */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Subtle warm focus ring for keyboard navigation only */
+*:focus-visible {
+  outline: 2px solid var(--color-border-2);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Never show focus ring on editable content or Radix menu items */
+[contenteditable]:focus-visible,
+.screenplay-preview:focus-visible,
+.title-page-editable:focus-visible,
+[data-radix-collection-item]:focus-visible,
+[role="menuitem"]:focus-visible {
+  outline: none;
 }
 
 /* Cmd+S save checkmark fade */

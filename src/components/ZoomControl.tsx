@@ -25,7 +25,7 @@ export function ZoomControl({ zoom, onZoomChange }: ZoomControlProps) {
   return (
     <div className="flex items-center gap-0.5">
       <Tooltip content="Zoom out">
-        <Button variant="ghost" size="icon" onClick={zoomOut} disabled={zoom <= MIN_ZOOM}>
+        <Button variant="ghost" size="icon" onClick={zoomOut} disabled={zoom <= MIN_ZOOM} aria-label="Zoom out">
           <Minus size={14} />
         </Button>
       </Tooltip>
@@ -38,7 +38,7 @@ export function ZoomControl({ zoom, onZoomChange }: ZoomControlProps) {
         </button>
       </Tooltip>
       <Tooltip content="Zoom in">
-        <Button variant="ghost" size="icon" onClick={zoomIn} disabled={zoom >= MAX_ZOOM}>
+        <Button variant="ghost" size="icon" onClick={zoomIn} disabled={zoom >= MAX_ZOOM} aria-label="Zoom in">
           <Plus size={14} />
         </Button>
       </Tooltip>

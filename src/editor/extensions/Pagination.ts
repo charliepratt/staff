@@ -74,6 +74,7 @@ export const Pagination = Extension.create<PaginationOptions>({
             const spacer = document.createElement('div')
             spacer.className = 'pagination-spacer'
             spacer.setAttribute('contenteditable', 'false')
+            spacer.setAttribute('aria-hidden', 'true')
             spacer.style.height = `${spacerHeight}px`
             spacer.style.userSelect = 'none'
             spacer.style.pointerEvents = 'none'
@@ -127,17 +128,26 @@ export const Pagination = Extension.create<PaginationOptions>({
             }
             if (blocks.length === 0) return
 
+            // --- READ PASS: measure all block positions first ---
+            const measurements: { block: HTMLElement; top: number; bottom: number }[] = []
+            for (const block of blocks) {
+              measurements.push({
+                block,
+                top: block.offsetTop,
+                bottom: block.offsetTop + block.offsetHeight,
+              })
+            }
+
+            // --- COMPUTE PASS: determine break positions ---
             let spacersSoFar = 0
             let currentPageBottom = opts.topMargin + pageContent
             const breakPositions: { pos: number; pageNum: number }[] = []
             let pageNum = 1
 
-            for (const block of blocks) {
-              const blockTop = block.offsetTop
-              const blockBottom = blockTop + block.offsetHeight
-              const virtualBottom = blockBottom - spacersSoFar
+            for (const { block, top, bottom } of measurements) {
+              const virtualBottom = bottom - spacersSoFar
 
-              if (virtualBottom > currentPageBottom && blockTop - spacersSoFar > opts.topMargin) {
+              if (virtualBottom > currentPageBottom && top - spacersSoFar > opts.topMargin) {
                 try {
                   const pos = editorView.posAtDOM(block, 0)
                   if (pos > 0) {
@@ -153,17 +163,11 @@ export const Pagination = Extension.create<PaginationOptions>({
             }
 
             const totalPages = breakPositions.length + 1
-
-            // Total height = N full pages + (N-1) spacers in the flow
-            // Each spacer is spacerHeight (224px) but only pageGap (32px)
-            // is the visual gap — the rest is margin space within pages.
-            // The min-height must ensure the last page is full height.
             const totalHeight =
               totalPages * opts.pageHeight +
               breakPositions.length * spacerHeight
 
-            // Set min-height on both the page container AND the editor
-            // so the white background fills the full page height
+            // --- WRITE PASS: apply all DOM mutations at once ---
             dom.style.minHeight = `${totalHeight}px`
 
             const pageContainer = dom.closest('.screenplay-page') as HTMLElement | null
