@@ -1,0 +1,139 @@
+/*
+ * Screenplay format CSS — industry standard formatting
+ * US Letter page: 8.5" x 11" (816px x 1056px at 96dpi)
+ * Standard margins: 1.5" left, 1" right, 1" top/bottom
+ *
+ * Typography hierarchy follows accepted screenplay conventions:
+ * - Scene headings: CAPS + bold (common practice, accepted by WGA)
+ * - Character cues: CAPS (mandatory)
+ * - Transitions: CAPS (mandatory)
+ * - Action/dialogue: regular weight
+ *
+ * Font is controlled via --screenplay-font CSS variable.
+ * Zoom is controlled via --screenplay-zoom CSS variable.
+ */
+
+/* The scrollable canvas behind the pages */
+.screenplay-canvas {
+  --screenplay-zoom: 1.25;
+  --screenplay-font: "Courier Prime", "Courier New", Courier, monospace;
+
+  background: #e8e6e1;
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+/* Each page is a US Letter sheet, scaled by zoom */
+.screenplay-page {
+  width: 816px;
+  min-height: 1056px;
+  background: white;
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.1),
+    0 6px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 2px;
+  position: relative;
+  flex-shrink: 0;
+  transform: scale(var(--screenplay-zoom));
+  transform-origin: top center;
+  margin-bottom: calc((var(--screenplay-zoom) - 1) * 1056px);
+}
+
+/* The Tiptap editor sitting inside the page */
+.screenplay-preview {
+  font-family: var(--screenplay-font);
+  font-size: 12pt;
+  line-height: 1.0;
+  color: #1a1a1a;
+  padding: 1in 1in 1in 1.5in;
+  min-height: 1056px;
+}
+
+/*
+ * Scene Heading (Slugline)
+ * ALL CAPS, bold — widely accepted practice.
+ * Underline optional but we skip it for cleaner on-screen reading.
+ * Double-spaced above (24px ≈ 2 lines at 12pt).
+ */
+.screenplay-scene-heading {
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-top: 24px;
+  margin-bottom: 12px;
+  letter-spacing: 0.03em;
+}
+
+.screenplay-scene-heading:first-child {
+  margin-top: 0;
+}
+
+/*
+ * Action lines
+ * Regular weight, flush left. The "body text" of a screenplay.
+ * Slightly looser line-height for readability.
+ */
+.screenplay-action {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  line-height: 1.15;
+}
+
+/*
+ * Character cue
+ * ALL CAPS (mandatory), slightly bolder than dialogue for scanability.
+ * This is how readers find who's speaking — it needs to pop.
+ */
+.screenplay-character {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-left: 2in;
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+
+/*
+ * Parenthetical (wrylies)
+ * Regular weight, italic feel via lighter color.
+ * Tighter to dialogue — these are whispered stage directions.
+ */
+.screenplay-parenthetical {
+  margin-left: 1.5in;
+  max-width: 2in;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  color: #444;
+  font-style: italic;
+}
+
+/*
+ * Dialogue
+ * Regular weight. The most-read element — needs to be clean and effortless.
+ * Slightly more generous line-height than action for speakability.
+ */
+.screenplay-dialogue {
+  margin-left: 1in;
+  max-width: 3.5in;
+  margin-top: 2px;
+  margin-bottom: 0;
+  line-height: 1.2;
+}
+
+/*
+ * Transition
+ * ALL CAPS, right-aligned, bold.
+ * These are structural markers — they should feel definitive.
+ */
+.screenplay-transition {
+  text-align: right;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
