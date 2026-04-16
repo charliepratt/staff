@@ -13,6 +13,15 @@ interface ShortcutGroup {
 
 const groups: ShortcutGroup[] = [
   {
+    title: 'General',
+    shortcuts: [
+      { keys: `${MOD}S`, description: 'Save' },
+      { keys: `${MOD}Z`, description: 'Undo' },
+      { keys: `${MOD} ${SHIFT} Z`, description: 'Redo' },
+      { keys: `${MOD}\\`, description: 'Toggle scene navigator' },
+    ],
+  },
+  {
     title: 'Element Formatting',
     shortcuts: [
       { keys: `${MOD}1`, description: 'Scene Heading' },
@@ -21,11 +30,6 @@ const groups: ShortcutGroup[] = [
       { keys: `${MOD}4`, description: 'Dialogue' },
       { keys: `${MOD}5`, description: 'Parenthetical' },
       { keys: `${MOD}6`, description: 'Transition' },
-    ],
-  },
-  {
-    title: 'Navigation',
-    shortcuts: [
       { keys: 'Tab', description: 'Cycle to next element type' },
       { keys: `${SHIFT} Tab`, description: 'Cycle to previous element type' },
     ],
