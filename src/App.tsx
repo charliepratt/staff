@@ -1,8 +1,11 @@
+import { useState } from 'react'
 import { TooltipProvider } from './ui/Tooltip'
 import { ScreenplayEditor } from './components/ScreenplayEditor'
 import { PenLine } from 'lucide-react'
 
 export default function App() {
+  const [zoom, setZoom] = useState(1.25)
+
   return (
     <TooltipProvider delayDuration={300}>
       <div className="flex flex-col min-h-screen bg-surface-1">
@@ -13,10 +16,9 @@ export default function App() {
               TypeyTypey
             </h1>
           </div>
-          <span className="text-xs font-medium text-text-3">Screenplay</span>
         </header>
         <main className="flex-1 flex flex-col">
-          <ScreenplayEditor />
+          <ScreenplayEditor zoom={zoom} onZoomChange={setZoom} />
         </main>
       </div>
     </TooltipProvider>

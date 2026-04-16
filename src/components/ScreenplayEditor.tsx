@@ -6,7 +6,6 @@ import { useAutoSave } from '../storage/useAutoSave'
 import { FormatToolbar } from './FormatToolbar'
 import { SideToolbar } from './SideToolbar'
 import { FormatContextMenu } from './FormatContextMenu'
-import { ZoomControl } from './ZoomControl'
 import { defaultFont, type ScreenplayFont } from '../formats/screenplay/fonts'
 import '../formats/screenplay/screenplay.css'
 
@@ -85,12 +84,15 @@ const defaultContent = {
   ],
 }
 
-export function ScreenplayEditor() {
+interface ScreenplayEditorProps {
+  zoom: number
+  onZoomChange: (zoom: number) => void
+}
+
+export function ScreenplayEditor({ zoom, onZoomChange }: ScreenplayEditorProps) {
   const { save, load } = useAutoSave(DOCUMENT_ID)
   const [initialContent, setInitialContent] = useState(defaultContent)
   const [loaded, setLoaded] = useState(false)
-  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'idle'>('idle')
-  const [zoom, setZoom] = useState(1.25)
   const [font, setFont] = useState<ScreenplayFont>(defaultFont)
 
   useEffect(() => {
@@ -124,10 +126,7 @@ export function ScreenplayEditor() {
         },
       },
       onUpdate: ({ editor: e }) => {
-        setSaveStatus('saving')
         save(e.getJSON())
-        // The save is debounced, so we show "saving" briefly
-        setTimeout(() => setSaveStatus('saved'), 1200)
       },
     },
     [loaded],
@@ -144,7 +143,7 @@ export function ScreenplayEditor() {
   return (
     <div className="flex flex-col flex-1">
       <div className="sticky top-0 z-30 xl:relative">
-        <FormatToolbar editor={editor} font={font} onFontChange={setFont} />
+        <FormatToolbar editor={editor} font={font} onFontChange={setFont} zoom={zoom} onZoomChange={onZoomChange} />
       </div>
       <SideToolbar editor={editor} />
       <div
@@ -156,15 +155,6 @@ export function ScreenplayEditor() {
         </div>
       </div>
       <FormatContextMenu editor={editor} />
-      <div className="px-3 py-1.5 text-xs text-text-3 border-t border-border-1 bg-surface-2 flex items-center justify-between">
-        <span className="font-medium">Screenplay</span>
-        <ZoomControl zoom={zoom} onZoomChange={setZoom} />
-        <span className="min-w-[4rem] text-right">
-          {saveStatus === 'saving' && 'Saving...'}
-          {saveStatus === 'saved' && 'Saved'}
-          {saveStatus === 'idle' && ''}
-        </span>
-      </div>
     </div>
   )
 }
