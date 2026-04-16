@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import type { Editor } from '@tiptap/react'
-import { PanelLeftClose, FileText, Clapperboard } from 'lucide-react'
+import { PanelLeft, FileText } from 'lucide-react'
 import { Tooltip } from '../ui/Tooltip'
 import { sceneFlashKey } from '../editor/extensions/SceneFlash'
 import type { TitlePageData } from './TitlePage'
@@ -119,7 +119,7 @@ export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNaviga
             onClick={onClose}
             className="p-1 rounded text-text-3 hover:text-text-1 hover:bg-surface-3 cursor-pointer transition-colors"
           >
-            <PanelLeftClose size={14} />
+            <PanelLeft size={14} />
           </button>
         </Tooltip>
       </div>
@@ -129,12 +129,12 @@ export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNaviga
           onClick={scrollToTop}
           className={`w-full text-left px-3 py-2 flex items-start gap-2 text-xs transition-colors cursor-pointer group ${
             activePos === -1
-              ? 'bg-accent/8 border-l-2 border-accent'
+              ? 'bg-border-1/50 border-l-2 border-accent'
               : 'hover:bg-surface-2 border-l-2 border-transparent'
           }`}
         >
-          <FileText size={12} className={`shrink-0 mt-px ${activePos === -1 ? 'text-accent' : 'text-text-3'}`} />
-          <span className={`truncate leading-snug ${activePos === -1 ? 'text-accent font-medium' : 'text-text-2 group-hover:text-text-1'}`}>
+          <FileText size={12} className={`shrink-0 mt-px ${activePos === -1 ? 'text-text-1' : 'text-text-3'}`} />
+          <span className={`truncate leading-snug ${activePos === -1 ? 'text-text-1 font-medium' : 'text-text-2 group-hover:text-text-1'}`}>
             {titlePage.title || 'Title Page'}
           </span>
         </button>
@@ -152,14 +152,14 @@ export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNaviga
                 onClick={() => jumpToScene(scene.pos)}
                 className={`w-full text-left px-3 py-2 flex items-start gap-2 text-xs transition-colors cursor-pointer group ${
                   isActive
-                    ? 'bg-accent/8 border-l-2 border-accent'
+                    ? 'bg-border-1/50 border-l-2 border-accent'
                     : 'hover:bg-surface-2 border-l-2 border-transparent'
                 }`}
               >
-                <span className={`tabular-nums shrink-0 mt-px w-4 text-right ${isActive ? 'text-accent' : 'text-text-3'}`}>
+                <span className={`tabular-nums shrink-0 mt-px w-4 text-right ${isActive ? 'text-text-1' : 'text-text-3'}`}>
                   {scene.index}
                 </span>
-                <span className={`truncate leading-snug ${isActive ? 'text-accent font-medium' : 'text-text-2 group-hover:text-text-1'}`}>
+                <span className={`truncate leading-snug ${isActive ? 'text-text-1 font-medium' : 'text-text-2 group-hover:text-text-1'}`}>
                   {scene.text.toUpperCase()}
                 </span>
               </button>
@@ -167,7 +167,7 @@ export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNaviga
           })
         )}
       </div>
-      <div className="px-3 py-2 border-t border-border-1 text-[11px] text-text-3">
+      <div className="px-3 py-2 border-t border-border-1 text-xs text-text-3">
         {scenes.length} {scenes.length === 1 ? 'scene' : 'scenes'}
       </div>
     </div>
@@ -201,7 +201,7 @@ export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNaviga
             onClick={() => setMobileOpen(true)}
             className="fixed bottom-4 left-4 z-40 p-3 bg-surface-1 border border-border-1 rounded-full shadow-lg text-text-2 hover:text-text-1 cursor-pointer transition-colors"
           >
-            <Clapperboard size={18} />
+            <PanelLeft size={18} />
           </button>
         </Tooltip>
 
