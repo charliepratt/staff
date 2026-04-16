@@ -44,13 +44,15 @@ export function FontPicker({ selected, onSelect }: FontPickerProps) {
                 <DropdownMenuItem
                   key={font.id}
                   onSelect={() => onSelect(font)}
-                  className="flex items-center justify-between gap-3 py-2"
+                  className={`flex items-center justify-between gap-3 py-2 ${
+                    selected.id === font.id ? 'bg-border-1/50' : ''
+                  }`}
                 >
                   <div className="flex flex-col gap-0.5 min-w-0">
                     <span
                       style={{ fontFamily: font.family }}
                       className={`text-sm truncate ${
-                        selected.id === font.id ? 'text-accent font-medium' : ''
+                        selected.id === font.id ? 'text-text-1 font-medium' : ''
                       }`}
                     >
                       {font.name}

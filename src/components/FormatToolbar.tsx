@@ -6,6 +6,7 @@ import {
   MessageSquareText,
   Parentheses,
   ArrowRightToLine,
+  PanelLeft,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { screenplayElements, type ScreenplayElement } from '../formats/screenplay/extensions'
@@ -32,9 +33,11 @@ interface FormatToolbarProps {
   wordCount: number
   pageCount: number
   runtime: string
+  navOpen: boolean
+  onNavToggle: () => void
 }
 
-export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, wordCount, pageCount, runtime }: FormatToolbarProps) {
+export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, wordCount, pageCount, runtime, navOpen, onNavToggle }: FormatToolbarProps) {
   const setElement = (type: ScreenplayElement) => {
     editor.chain().focus().setNode(type).run()
   }
@@ -43,6 +46,20 @@ export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, 
 
   return (
     <div className="flex items-center px-3 py-1.5 border-b border-border-1 bg-surface-2">
+      {/* Scene navigator toggle */}
+      <Tooltip content={`Scenes (\u2318\\)`}>
+        <button
+          onClick={onNavToggle}
+          className={`p-1.5 rounded-md transition-colors cursor-pointer ${
+            navOpen
+              ? 'bg-border-1 text-text-1'
+              : 'text-text-2 hover:bg-surface-3 hover:text-text-1'
+          }`}
+        >
+          <PanelLeft size={16} />
+        </button>
+      </Tooltip>
+      <div className="w-px h-6 bg-border-1 mx-2" />
       <FontPicker selected={font} onSelect={onFontChange} />
       <div className="w-px h-6 bg-border-1 mx-2" />
       <div className="flex items-center gap-0.5">
@@ -55,7 +72,7 @@ export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, 
                 onClick={() => setElement(el.type)}
                 className={`flex items-center gap-1.5 px-2 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
                   isActive
-                    ? 'bg-accent text-accent-text'
+                    ? 'bg-border-1 text-text-1'
                     : 'text-text-2 hover:bg-surface-3 hover:text-text-1'
                 }`}
               >

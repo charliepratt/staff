@@ -90,15 +90,16 @@ interface ScreenplayEditorProps {
   zoom: number
   onZoomChange: (zoom: number) => void
   onSaveStatusChange: (status: 'idle' | 'saving' | 'saved') => void
+  navOpen: boolean
+  onNavToggle: () => void
 }
 
-export function ScreenplayEditor({ zoom, onZoomChange, onSaveStatusChange }: ScreenplayEditorProps) {
+export function ScreenplayEditor({ zoom, onZoomChange, onSaveStatusChange, navOpen, onNavToggle }: ScreenplayEditorProps) {
   const { save, load } = useAutoSave(DOCUMENT_ID)
   const [initialContent, setInitialContent] = useState(defaultContent)
   const [loaded, setLoaded] = useState(false)
   const [font, setFont] = useState<ScreenplayFont>(defaultFont)
   const [titlePage, setTitlePage] = useState<TitlePageData>(defaultTitlePage)
-  const [navCollapsed, setNavCollapsed] = useState(false)
 
   useEffect(() => {
     load().then((saved) => {
@@ -181,14 +182,16 @@ export function ScreenplayEditor({ zoom, onZoomChange, onSaveStatusChange }: Scr
           wordCount={stats.wordCount}
           pageCount={stats.pageCount}
           runtime={stats.runtime}
+          navOpen={navOpen}
+          onNavToggle={onNavToggle}
         />
       </div>
       <div className="flex flex-1 min-h-0">
         <SceneNavigator
           editor={editor}
           titlePage={titlePage}
-          collapsed={navCollapsed}
-          onToggle={() => setNavCollapsed(!navCollapsed)}
+          open={navOpen}
+          onClose={onNavToggle}
         />
         <FormatContextMenu editor={editor}>
           <div

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import type { Editor } from '@tiptap/react'
-import { PanelLeftClose, PanelLeftOpen, FileText, Clapperboard } from 'lucide-react'
+import { PanelLeftClose, FileText, Clapperboard } from 'lucide-react'
 import { Tooltip } from '../ui/Tooltip'
 import { sceneFlashKey } from '../editor/extensions/SceneFlash'
 import type { TitlePageData } from './TitlePage'
@@ -14,8 +14,8 @@ interface Scene {
 interface SceneNavigatorProps {
   editor: Editor
   titlePage: TitlePageData
-  collapsed: boolean
-  onToggle: () => void
+  open: boolean
+  onClose: () => void
 }
 
 const MIN_WIDTH = 180
@@ -38,7 +38,7 @@ function extractScenes(editor: Editor): Scene[] {
   return scenes
 }
 
-export function SceneNavigator({ editor, titlePage, collapsed, onToggle }: SceneNavigatorProps) {
+export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNavigatorProps) {
   const [scenes, setScenes] = useState<Scene[]>([])
   const [mobileOpen, setMobileOpen] = useState(false)
   const [width, setWidth] = useState(DEFAULT_WIDTH)
@@ -56,7 +56,6 @@ export function SceneNavigator({ editor, titlePage, collapsed, onToggle }: Scene
     return () => { editor.off('update', refresh) }
   }, [editor, refresh])
 
-  // Resize drag handling
   const startDrag = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
     setIsDragging(true)
@@ -83,14 +82,12 @@ export function SceneNavigator({ editor, titlePage, collapsed, onToggle }: Scene
     setActivePos(pos)
     editor.chain().focus().setTextSelection(pos + 1).run()
 
-    // Flash the scene heading via ProseMirror node decoration
     editor.view.dispatch(
       editor.state.tr
         .setMeta(sceneFlashKey, pos)
         .setMeta('addToHistory', false)
     )
 
-    // Scroll into view
     requestAnimationFrame(() => {
       try {
         const resolved = editor.view.domAtPos(pos + 1)
@@ -99,7 +96,7 @@ export function SceneNavigator({ editor, titlePage, collapsed, onToggle }: Scene
           : resolved.node.parentElement
         el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       } catch {
-        // ignore if position is invalid
+        // ignore
       }
     })
 
@@ -107,6 +104,7 @@ export function SceneNavigator({ editor, titlePage, collapsed, onToggle }: Scene
   }
 
   const scrollToTop = () => {
+    setActivePos(-1)
     const canvas = document.querySelector('.screenplay-canvas')
     canvas?.scrollTo({ top: 0, behavior: 'smooth' })
     setMobileOpen(false)
@@ -116,9 +114,9 @@ export function SceneNavigator({ editor, titlePage, collapsed, onToggle }: Scene
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-3 py-2.5 border-b border-border-1">
         <span className="text-xs font-semibold text-text-2 uppercase tracking-wider">Scenes</span>
-        <Tooltip content="Collapse panel">
+        <Tooltip content="Close panel">
           <button
-            onClick={() => { onToggle(); setMobileOpen(false) }}
+            onClick={onClose}
             className="p-1 rounded text-text-3 hover:text-text-1 hover:bg-surface-3 cursor-pointer transition-colors"
           >
             <PanelLeftClose size={14} />
@@ -128,7 +126,7 @@ export function SceneNavigator({ editor, titlePage, collapsed, onToggle }: Scene
       <div className="flex-1 overflow-y-auto py-1">
         {/* Title page — same visual treatment as scene entries */}
         <button
-          onClick={() => { setActivePos(-1); scrollToTop() }}
+          onClick={scrollToTop}
           className={`w-full text-left px-3 py-2 flex items-start gap-2 text-xs transition-colors cursor-pointer group ${
             activePos === -1
               ? 'bg-accent/8 border-l-2 border-accent'
@@ -177,36 +175,24 @@ export function SceneNavigator({ editor, titlePage, collapsed, onToggle }: Scene
 
   return (
     <>
-      {/* Desktop: in-flow panel — screenplay centers in remaining space */}
-      {!collapsed && (
-        <div
-          ref={panelRef}
-          className="hidden md:flex bg-surface-1 border-r border-border-1 flex-col shrink-0 relative"
-          style={{ width: `${width}px` }}
-        >
+      {/* Desktop: in-flow panel with slide transition */}
+      <div
+        ref={panelRef}
+        className="hidden md:flex bg-surface-1 border-r border-border-1 flex-col shrink-0 relative overflow-hidden transition-all duration-150 ease-out"
+        style={{ width: open ? `${width}px` : '0px', borderRightWidth: open ? '1px' : '0px' }}
+      >
+        <div style={{ width: `${width}px`, minWidth: `${width}px` }} className="flex flex-col h-full">
           {navContent}
+        </div>
+        {open && (
           <div
             onMouseDown={startDrag}
             className={`absolute top-0 right-0 bottom-0 w-1 cursor-col-resize transition-colors hover:bg-accent/30 ${
               isDragging ? 'bg-accent/30' : ''
             }`}
           />
-        </div>
-      )}
-
-      {/* Collapsed state: thin strip in flow */}
-      {collapsed && (
-        <div className="hidden md:flex items-start pt-2.5 pl-1.5 pr-1 bg-surface-1 border-r border-border-1 shrink-0">
-          <Tooltip content="Show scenes" side="right">
-            <button
-              onClick={onToggle}
-              className="p-1.5 rounded text-text-3 hover:text-text-1 hover:bg-surface-3 cursor-pointer transition-colors"
-            >
-              <PanelLeftOpen size={14} />
-            </button>
-          </Tooltip>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Mobile: overlay drawer */}
       <div className="md:hidden">
@@ -232,7 +218,6 @@ export function SceneNavigator({ editor, titlePage, collapsed, onToggle }: Scene
         )}
       </div>
 
-      {/* Prevent text selection while dragging */}
       {isDragging && (
         <div className="fixed inset-0 z-50 cursor-col-resize" />
       )}

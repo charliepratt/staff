@@ -11,6 +11,11 @@ const DEFAULT_ZOOM = 1.25
 export default function App() {
   const [zoom, setZoom] = useState(DEFAULT_ZOOM)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
+  const [navOpen, setNavOpen] = useState(true)
+
+  const toggleNav = useCallback(() => {
+    setNavOpen((v) => !v)
+  }, [])
 
   const zoomIn = useCallback(() => {
     setZoom((z) => {
@@ -32,6 +37,14 @@ export default function App() {
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
+      // Cmd+\ — toggle scene navigator
+      if ((e.metaKey || e.ctrlKey) && e.key === '\\') {
+        e.preventDefault()
+        toggleNav()
+        return
+      }
+
+      // Cmd+Shift+Plus/Minus/0 — zoom
       if (!(e.metaKey || e.ctrlKey) || !e.shiftKey) return
 
       if (e.key === '=' || e.key === '+') {
@@ -48,7 +61,7 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [zoomIn, zoomOut, zoomReset])
+  }, [zoomIn, zoomOut, zoomReset, toggleNav])
 
   return (
     <TooltipProvider delayDuration={300}>
@@ -70,6 +83,8 @@ export default function App() {
             zoom={zoom}
             onZoomChange={setZoom}
             onSaveStatusChange={setSaveStatus}
+            navOpen={navOpen}
+            onNavToggle={toggleNav}
           />
         </main>
       </div>
