@@ -45,7 +45,14 @@
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.08),
     0 4px 16px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
   overflow: visible;
+}
+
+.screenplay-page:hover {
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.07);
 }
 
 /* The Tiptap editor sitting inside the page */
@@ -114,6 +121,34 @@
 
 .screenplay-scene-heading:first-child {
   margin-top: 0;
+}
+
+/* Empty scene heading shows a warm placeholder */
+.screenplay-scene-heading:empty::before {
+  content: 'INT./EXT. LOCATION - TIME';
+  color: #c8c4be;
+  pointer-events: none;
+}
+
+/* Empty action shows a gentle nudge */
+.screenplay-action:empty::before {
+  content: 'Describe what we see...';
+  color: #c8c4be;
+  pointer-events: none;
+}
+
+/* Empty character cue */
+.screenplay-character:empty::before {
+  content: 'CHARACTER NAME';
+  color: #c8c4be;
+  pointer-events: none;
+}
+
+/* Empty dialogue */
+.screenplay-dialogue:empty::before {
+  content: 'What do they say?';
+  color: #c8c4be;
+  pointer-events: none;
 }
 
 /* Action lines */

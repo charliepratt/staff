@@ -1,6 +1,6 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { screenplayExtensions } from '../formats/screenplay/extensions'
 import { useAutoSave } from '../storage/useAutoSave'
 import { useDocumentStats } from '../editor/useDocumentStats'
@@ -161,6 +161,79 @@ export function ScreenplayEditor({ zoom, onZoomChange, onSaveStatusChange, navOp
   )
 
   const stats = useDocumentStats(editor)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [scrollRestored, setScrollRestored] = useState(false)
+
+  // Save cursor position on every selection change
+  useEffect(() => {
+    if (!editor) return
+
+    const saveCursor = () => {
+      const pos = editor.state.selection.from
+      sessionStorage.setItem(`cursor-${DOCUMENT_ID}`, String(pos))
+    }
+
+    editor.on('selectionUpdate', saveCursor)
+    editor.on('update', saveCursor)
+    return () => {
+      editor.off('selectionUpdate', saveCursor)
+      editor.off('update', saveCursor)
+    }
+  }, [editor])
+
+  // Restore cursor position and scroll to it after content + pagination loads
+  const hasRestored = useRef(false)
+  useEffect(() => {
+    if (!editor || hasRestored.current) return
+
+    const savedPos = sessionStorage.getItem(`cursor-${DOCUMENT_ID}`)
+    if (!savedPos) {
+      setScrollRestored(true)
+      return
+    }
+
+    const pos = parseInt(savedPos, 10)
+
+    // Wait for pagination spacers to render (they fire after editor update
+    // with a 100ms debounce + rAF), then restore cursor
+    const restore = () => {
+      hasRestored.current = true
+      try {
+        const maxPos = editor.state.doc.content.size
+        const safePos = Math.min(pos, maxPos)
+
+        // Set cursor
+        editor.chain().focus().setTextSelection(safePos).run()
+
+        // Wait one more frame for the DOM to update, then scroll
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            try {
+              const domPos = editor.view.domAtPos(safePos)
+              const el = domPos.node instanceof HTMLElement
+                ? domPos.node
+                : domPos.node.parentElement
+              if (el && scrollRef.current) {
+                const elRect = el.getBoundingClientRect()
+                const canvasRect = scrollRef.current.getBoundingClientRect()
+                const scrollTarget = scrollRef.current.scrollTop + (elRect.top - canvasRect.top) - canvasRect.height / 3
+                scrollRef.current.scrollTop = Math.max(0, scrollTarget)
+              }
+            } catch {
+              // fallback
+            }
+            setScrollRestored(true)
+          })
+        })
+      } catch {
+        setScrollRestored(true)
+      }
+    }
+
+    // Give pagination time to calculate and render spacers
+    const timer = setTimeout(restore, 500)
+    return () => clearTimeout(timer)
+  }, [editor])
 
   if (!loaded || !editor) {
     return (
@@ -195,8 +268,13 @@ export function ScreenplayEditor({ zoom, onZoomChange, onSaveStatusChange, navOp
         />
         <FormatContextMenu editor={editor}>
           <div
+            ref={scrollRef}
             className="screenplay-canvas"
-            style={{ '--screenplay-zoom': zoom, '--screenplay-font': font.family } as React.CSSProperties}
+            style={{
+              '--screenplay-zoom': zoom,
+              '--screenplay-font': font.family,
+              opacity: scrollRestored ? 1 : 0,
+            } as React.CSSProperties}
           >
             <TitlePage data={titlePage} onChange={handleTitlePageChange} />
             <div className="screenplay-page">
