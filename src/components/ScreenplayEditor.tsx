@@ -89,17 +89,17 @@ const defaultContent = {
 interface ScreenplayEditorProps {
   zoom: number
   onZoomChange: (zoom: number) => void
-  onSaveStatusChange: (status: 'idle' | 'saving' | 'saved') => void
   navOpen: boolean
   onNavToggle: () => void
 }
 
-export function ScreenplayEditor({ zoom, onZoomChange, onSaveStatusChange, navOpen, onNavToggle }: ScreenplayEditorProps) {
-  const { save, load } = useAutoSave(DOCUMENT_ID)
+export function ScreenplayEditor({ zoom, onZoomChange, navOpen, onNavToggle }: ScreenplayEditorProps) {
+  const { save, saveNow, load } = useAutoSave(DOCUMENT_ID)
   const [initialContent, setInitialContent] = useState(defaultContent)
   const [loaded, setLoaded] = useState(false)
   const [font, setFont] = useState<ScreenplayFont>(defaultFont)
   const [titlePage, setTitlePage] = useState<TitlePageData>(defaultTitlePage)
+  const [showSaveCheck, setShowSaveCheck] = useState(false)
 
   useEffect(() => {
     load().then((saved) => {
@@ -113,23 +113,12 @@ export function ScreenplayEditor({ zoom, onZoomChange, onSaveStatusChange, navOp
     })
   }, [load])
 
-  const triggerSave = useCallback(
-    (content: typeof defaultContent, tp: TitlePageData) => {
-      onSaveStatusChange('saving')
-      save(content, tp)
-      setTimeout(() => onSaveStatusChange('saved'), 1200)
-      setTimeout(() => onSaveStatusChange('idle'), 3200)
-    },
-    [save, onSaveStatusChange],
-  )
-
   const handleTitlePageChange = useCallback(
     (tp: TitlePageData) => {
       setTitlePage(tp)
-      // Save with current editor content + new title page
-      triggerSave(initialContent, tp)
+      save(defaultContent, tp)
     },
-    [triggerSave, initialContent],
+    [save],
   )
 
   const editor = useEditor(
@@ -153,8 +142,7 @@ export function ScreenplayEditor({ zoom, onZoomChange, onSaveStatusChange, navOp
         },
       },
       onUpdate: ({ editor: e }) => {
-        const content = e.getJSON()
-        triggerSave(content as typeof defaultContent, titlePage)
+        save(e.getJSON(), titlePage)
       },
     },
     [loaded],
@@ -181,7 +169,7 @@ export function ScreenplayEditor({ zoom, onZoomChange, onSaveStatusChange, navOp
     }
   }, [editor])
 
-  // Restore cursor position and scroll to it after content + pagination loads
+  // Restore cursor position after content + pagination loads
   const hasRestored = useRef(false)
   useEffect(() => {
     if (!editor || hasRestored.current) return
@@ -194,18 +182,13 @@ export function ScreenplayEditor({ zoom, onZoomChange, onSaveStatusChange, navOp
 
     const pos = parseInt(savedPos, 10)
 
-    // Wait for pagination spacers to render (they fire after editor update
-    // with a 100ms debounce + rAF), then restore cursor
     const restore = () => {
       hasRestored.current = true
       try {
         const maxPos = editor.state.doc.content.size
         const safePos = Math.min(pos, maxPos)
-
-        // Set cursor
         editor.chain().focus().setTextSelection(safePos).run()
 
-        // Wait one more frame for the DOM to update, then scroll
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             try {
@@ -230,10 +213,34 @@ export function ScreenplayEditor({ zoom, onZoomChange, onSaveStatusChange, navOp
       }
     }
 
-    // Give pagination time to calculate and render spacers
     const timer = setTimeout(restore, 500)
     return () => clearTimeout(timer)
   }, [editor])
+
+  // Cmd+S — immediate save with subtle checkmark
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault()
+        saveNow().then(() => {
+          setShowSaveCheck(true)
+          setTimeout(() => setShowSaveCheck(false), 1500)
+        })
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [saveNow])
+
+  // beforeunload — force save on tab close
+  useEffect(() => {
+    function handleUnload() {
+      saveNow()
+    }
+    window.addEventListener('beforeunload', handleUnload)
+    return () => window.removeEventListener('beforeunload', handleUnload)
+  }, [saveNow])
 
   if (!loaded || !editor) {
     return (
@@ -276,6 +283,15 @@ export function ScreenplayEditor({ zoom, onZoomChange, onSaveStatusChange, navOp
               opacity: scrollRestored ? 1 : 0,
             } as React.CSSProperties}
           >
+            {/* Cmd+S save confirmation — bottom-right of canvas */}
+            {showSaveCheck && (
+              <div className="fixed bottom-6 right-10 z-40 save-check-fade flex items-center gap-1.5 px-3 py-1.5 bg-surface-2 border border-border-1 rounded-full">
+                <span className="text-xs text-text-2">Saved</span>
+                <svg width="12" height="12" viewBox="0 0 12 12" className="text-success">
+                  <path d="M2.5 6.5L5 9L9.5 3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+            )}
             <TitlePage data={titlePage} onChange={handleTitlePageChange} />
             <div className="screenplay-page">
               <EditorContent editor={editor} />
