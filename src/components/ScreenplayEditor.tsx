@@ -1,6 +1,6 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { screenplayExtensions } from '../formats/screenplay/extensions'
 import { useAutoSave } from '../storage/useAutoSave'
 import { useDocumentStats } from '../editor/useDocumentStats'
@@ -89,9 +89,10 @@ const defaultContent = {
 interface ScreenplayEditorProps {
   zoom: number
   onZoomChange: (zoom: number) => void
+  onSaveStatusChange: (status: 'idle' | 'saving' | 'saved') => void
 }
 
-export function ScreenplayEditor({ zoom, onZoomChange }: ScreenplayEditorProps) {
+export function ScreenplayEditor({ zoom, onZoomChange, onSaveStatusChange }: ScreenplayEditorProps) {
   const { save, load } = useAutoSave(DOCUMENT_ID)
   const [initialContent, setInitialContent] = useState(defaultContent)
   const [loaded, setLoaded] = useState(false)
@@ -101,12 +102,34 @@ export function ScreenplayEditor({ zoom, onZoomChange }: ScreenplayEditorProps) 
 
   useEffect(() => {
     load().then((saved) => {
-      if (saved) {
-        setInitialContent(saved as typeof defaultContent)
+      if (saved.content) {
+        setInitialContent(saved.content as typeof defaultContent)
+      }
+      if (saved.titlePage) {
+        setTitlePage(saved.titlePage)
       }
       setLoaded(true)
     })
   }, [load])
+
+  const triggerSave = useCallback(
+    (content: typeof defaultContent, tp: TitlePageData) => {
+      onSaveStatusChange('saving')
+      save(content, tp)
+      setTimeout(() => onSaveStatusChange('saved'), 1200)
+      setTimeout(() => onSaveStatusChange('idle'), 3200)
+    },
+    [save, onSaveStatusChange],
+  )
+
+  const handleTitlePageChange = useCallback(
+    (tp: TitlePageData) => {
+      setTitlePage(tp)
+      // Save with current editor content + new title page
+      triggerSave(initialContent, tp)
+    },
+    [triggerSave, initialContent],
+  )
 
   const editor = useEditor(
     {
@@ -129,7 +152,8 @@ export function ScreenplayEditor({ zoom, onZoomChange }: ScreenplayEditorProps) 
         },
       },
       onUpdate: ({ editor: e }) => {
-        save(e.getJSON())
+        const content = e.getJSON()
+        triggerSave(content as typeof defaultContent, titlePage)
       },
     },
     [loaded],
@@ -159,24 +183,25 @@ export function ScreenplayEditor({ zoom, onZoomChange }: ScreenplayEditorProps) 
           runtime={stats.runtime}
         />
       </div>
-      <div className="relative flex-1 min-h-0">
+      <div className="flex flex-1 min-h-0">
         <SceneNavigator
           editor={editor}
           titlePage={titlePage}
           collapsed={navCollapsed}
           onToggle={() => setNavCollapsed(!navCollapsed)}
         />
-        <div
-          className="screenplay-canvas"
-          style={{ '--screenplay-zoom': zoom, '--screenplay-font': font.family } as React.CSSProperties}
-        >
-          <TitlePage data={titlePage} onChange={setTitlePage} />
-          <div className="screenplay-page">
-            <EditorContent editor={editor} />
+        <FormatContextMenu editor={editor}>
+          <div
+            className="screenplay-canvas"
+            style={{ '--screenplay-zoom': zoom, '--screenplay-font': font.family } as React.CSSProperties}
+          >
+            <TitlePage data={titlePage} onChange={handleTitlePageChange} />
+            <div className="screenplay-page">
+              <EditorContent editor={editor} />
+            </div>
           </div>
-        </div>
+        </FormatContextMenu>
       </div>
-      <FormatContextMenu editor={editor} />
     </div>
   )
 }

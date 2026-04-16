@@ -12,13 +12,13 @@ export interface TitlePageData {
 }
 
 const defaultTitlePage: TitlePageData = {
-  title: 'Untitled Screenplay',
-  author: '',
-  contactName: '',
-  contactEmail: '',
-  contactPhone: '',
-  draft: '',
-  date: '',
+  title: 'The Last Draft',
+  author: 'Sarah Chen',
+  contactName: 'Sarah Chen',
+  contactEmail: 'sarah@example.com',
+  contactPhone: '(310) 555-0142',
+  draft: 'First Draft',
+  date: 'April 2026',
 }
 
 interface TitlePageProps {
