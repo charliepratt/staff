@@ -10,7 +10,11 @@ Open Claude Code in your project and say:
 
 > Ingest https://github.com/charliepratt/staff and set it up for this project.
 
-Claude handles the rest. It'll install the team commands and create a `staff-config.md` file where you describe your project — what it is, who it's for, what stage it's at, your tech stack, business model, and competitive landscape. Every team reads this file to tailor their advice to your situation.
+Claude will run `setup.sh`, which installs the team commands and creates a `staff-config.md` file. **Restart Claude Code** after setup so it picks up the new commands.
+
+After restarting, Claude will notice the config is blank and prompt you to run `/setup`. This is a short interview — it asks about your project in a few rounds (what it is, tech stack, stage, business model, competitors, what domain experts you need) and fills out `staff-config.md` for you. Every team reads this file to tailor their advice to your situation.
+
+You can re-run `/setup` any time to update your project config.
 
 ## How It Works
 
@@ -25,6 +29,7 @@ Every team follows the same process:
 
 | Command | Team | Personas | Focus |
 |---------|------|----------|-------|
+| `/setup` | Setup | *(interactive)* | Interviews you, fills out staff-config.md |
 | `/design` | Design | Elena, David, Greta | Aesthetics, UX, design systems |
 | `/engineering` | Engineering | Priya, Marcus, Anders | Architecture, implementation, security |
 | `/product` | Product | Sofia, Daniel, Chidi | Users, market strategy, execution |
