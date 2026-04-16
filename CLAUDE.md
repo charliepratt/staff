@@ -12,12 +12,19 @@ This repository contains a portable team-of-experts skill system for Claude Code
 
 ## Installation
 
-Run `setup.sh` from the target project root to copy skills and config template.
+Run `setup.sh` from the target project root to copy skills and config template. The script will:
+1. Copy all command files to `.claude/commands/`
+2. Create `staff-config.md` (if it doesn't exist)
+3. Add a Staff section to the project's `CLAUDE.md` that prompts users to run `/setup`
+4. Print a restart reminder with next steps
+
+After restarting Claude, the CLAUDE.md instruction will trigger Claude to proactively suggest `/setup` if the config is still blank.
 
 ## Teams
 
 | Command | Team | Personas |
 |---------|------|----------|
+| `/setup` | Setup | Interviews user, fills out staff-config.md |
 | `/design` | Design | Elena (aesthetic), David (UX), Greta (systems) |
 | `/engineering` | Engineering | Priya (architect), Marcus (implementer), Anders (security/reliability) |
 | `/seo` | SEO | Isabela (technical), Klaus (content), Nour (growth) |
