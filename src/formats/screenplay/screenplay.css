@@ -23,7 +23,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 32px;
+  /* Gap scales with zoom so it looks proportional at all levels */
+  gap: calc(32px * var(--screenplay-zoom));
 }
 
 /*
@@ -40,8 +41,7 @@
   flex-shrink: 0;
   transform: scale(var(--screenplay-zoom));
   transform-origin: top center;
-  /* Compensate for scale overflow so layout gap works correctly */
-  margin-bottom: calc((var(--screenplay-zoom) - 1) * 1056px);
+  /* margin-bottom set dynamically by Pagination.ts to compensate for scale overflow */
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.08),
     0 4px 16px rgba(0, 0, 0, 0.05);
@@ -216,7 +216,7 @@
   flex-shrink: 0;
   transform: scale(var(--screenplay-zoom));
   transform-origin: top center;
-  /* Compensate for scale overflow so layout gap works correctly */
+  /* Title page is fixed height — static compensation is fine */
   margin-bottom: calc((var(--screenplay-zoom) - 1) * 1056px);
   padding: 1in;
   box-sizing: border-box;

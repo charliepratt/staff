@@ -154,12 +154,29 @@ export const Pagination = Extension.create<PaginationOptions>({
 
             const totalPages = breakPositions.length + 1
 
+            // Total height = N full pages + (N-1) spacers in the flow
+            // Each spacer is spacerHeight (224px) but only pageGap (32px)
+            // is the visual gap — the rest is margin space within pages.
+            // The min-height must ensure the last page is full height.
+            const totalHeight =
+              totalPages * opts.pageHeight +
+              breakPositions.length * spacerHeight
+
+            // Set min-height on both the page container AND the editor
+            // so the white background fills the full page height
+            dom.style.minHeight = `${totalHeight}px`
+
             const pageContainer = dom.closest('.screenplay-page') as HTMLElement | null
             if (pageContainer) {
-              const totalHeight =
-                totalPages * opts.pageHeight +
-                breakPositions.length * opts.pageGap
               pageContainer.style.minHeight = `${totalHeight}px`
+
+              // Compensate for transform: scale() — the layout box
+              // doesn't grow with the visual size, so we add margin-bottom
+              // to reserve the correct space in the parent flex layout
+              const zoomStr = getComputedStyle(pageContainer).getPropertyValue('--screenplay-zoom')
+              const zoom = parseFloat(zoomStr) || 1.25
+              const marginBottom = (zoom - 1) * totalHeight
+              pageContainer.style.marginBottom = `${marginBottom}px`
             }
 
             // Build widget decorations (spacers only — no visual content)
