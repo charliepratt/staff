@@ -142,8 +142,8 @@ export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNaviga
           }`}
         >
           <FileText size={12} className={`shrink-0 mt-px ${activePos === -1 ? 'text-accent' : 'text-accent/40'}`} />
-          <span className={`truncate leading-snug ${activePos === -1 ? 'text-text-1 font-medium' : 'text-text-2 group-hover:text-text-1'}`}>
-            {titlePage.title || 'Title Page'}
+          <span className={`truncate leading-snug font-semibold ${activePos === -1 ? 'text-text-1' : 'text-text-2 group-hover:text-text-1'}`}>
+            {(titlePage.title || 'Title Page').toUpperCase()}
           </span>
         </button>
 
