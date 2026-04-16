@@ -120,7 +120,7 @@ export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNaviga
   const navContent = (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-3 py-2.5 border-b border-border-1">
-        <span className="text-xs font-semibold text-text-2 uppercase tracking-wider">Scenes</span>
+        <span className="text-xs font-semibold text-accent/70 uppercase tracking-wider">Scenes</span>
         <Tooltip content="Close panel">
           <button
             onClick={onClose}
@@ -140,14 +140,14 @@ export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNaviga
               : 'hover:bg-surface-2 border-l-2 border-transparent'
           }`}
         >
-          <FileText size={12} className={`shrink-0 mt-px ${activePos === -1 ? 'text-text-1' : 'text-text-3'}`} />
+          <FileText size={12} className={`shrink-0 mt-px ${activePos === -1 ? 'text-accent' : 'text-accent/40'}`} />
           <span className={`truncate leading-snug ${activePos === -1 ? 'text-text-1 font-medium' : 'text-text-2 group-hover:text-text-1'}`}>
             {titlePage.title || 'Title Page'}
           </span>
         </button>
 
         {scenes.length === 0 ? (
-          <div className="px-3 py-4 text-[11px] text-text-3 text-center">
+          <div className="px-3 py-4 text-xs text-text-3 text-center">
             No scenes yet. Add a scene heading to get started.
           </div>
         ) : (
@@ -163,7 +163,7 @@ export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNaviga
                     : 'hover:bg-surface-2 border-l-2 border-transparent'
                 }`}
               >
-                <span className={`tabular-nums shrink-0 mt-px w-4 text-right ${isActive ? 'text-text-1' : 'text-text-3'}`}>
+                <span className={`tabular-nums shrink-0 mt-px w-4 text-right ${isActive ? 'text-accent' : 'text-accent/40'}`}>
                   {scene.index}
                 </span>
                 <span className={`truncate leading-snug ${isActive ? 'text-text-1 font-medium' : 'text-text-2 group-hover:text-text-1'}`}>
@@ -174,7 +174,8 @@ export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNaviga
           })
         )}
       </div>
-      <div className="px-3 py-2 border-t border-border-1 text-xs text-text-3">
+      <div className="px-3 py-2 border-t border-border-1 text-xs text-text-3 flex items-center gap-1.5">
+        <span className="w-1.5 h-1.5 rounded-full bg-accent/30" />
         {scenes.length} {scenes.length === 1 ? 'scene' : 'scenes'}
       </div>
     </div>
