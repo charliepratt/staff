@@ -118,7 +118,7 @@ export function KeyboardShortcuts() {
             <div className="flex-1 overflow-y-auto px-5 py-4">
               {groups.map((group, i) => (
                 <div key={group.title} className={i > 0 ? 'mt-5 pt-5 border-t border-border-1' : ''}>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-accent mb-3">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-text-2 mb-3">
                     {group.title}
                   </h3>
                   <div className="space-y-2">

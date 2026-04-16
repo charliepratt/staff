@@ -7,6 +7,8 @@ import {
   Parentheses,
   ArrowRightToLine,
   PanelLeft,
+  Undo2,
+  Redo2,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { screenplayElements, type ScreenplayElement } from '../formats/screenplay/extensions'
@@ -60,6 +62,26 @@ export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, 
         </button>
       </Tooltip>
       <div className="w-px h-6 bg-border-1 mx-2" />
+      {/* Undo / Redo */}
+      <Tooltip content="Undo (\u2318Z)">
+        <button
+          onClick={() => editor.chain().focus().undo().run()}
+          disabled={!editor.can().undo()}
+          className="p-1.5 rounded-md transition-colors cursor-pointer text-text-2 hover:bg-surface-3 hover:text-text-1 disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <Undo2 size={15} />
+        </button>
+      </Tooltip>
+      <Tooltip content="Redo (\u2318\u21E7Z)">
+        <button
+          onClick={() => editor.chain().focus().redo().run()}
+          disabled={!editor.can().redo()}
+          className="p-1.5 rounded-md transition-colors cursor-pointer text-text-2 hover:bg-surface-3 hover:text-text-1 disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <Redo2 size={15} />
+        </button>
+      </Tooltip>
+      <div className="w-px h-6 bg-border-1 mx-2" />
       <FontPicker selected={font} onSelect={onFontChange} />
       <div className="w-px h-6 bg-border-1 mx-2" />
       <div className="flex items-center gap-0.5">
@@ -85,7 +107,7 @@ export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, 
       </div>
       <div className="ml-auto flex items-center gap-3">
         <Tooltip content={`${wordCount.toLocaleString()} words \u00b7 ${pageCount} ${pageCount === 1 ? 'page' : 'pages'}`}>
-          <span className="text-[11px] text-text-3 tabular-nums cursor-default hidden sm:inline">
+          <span className="text-xs text-text-2 tabular-nums cursor-default hidden sm:inline">
             {wordCount.toLocaleString()} words &middot; ~{runtime}
           </span>
         </Tooltip>
