@@ -3,9 +3,11 @@ import StarterKit from '@tiptap/starter-kit'
 import { useEffect, useState } from 'react'
 import { screenplayExtensions } from '../formats/screenplay/extensions'
 import { useAutoSave } from '../storage/useAutoSave'
+import { useDocumentStats } from '../editor/useDocumentStats'
 import { FormatToolbar } from './FormatToolbar'
-import { SideToolbar } from './SideToolbar'
+import { SceneNavigator } from './SceneNavigator'
 import { FormatContextMenu } from './FormatContextMenu'
+import { TitlePage, defaultTitlePage, type TitlePageData } from './TitlePage'
 import { defaultFont, type ScreenplayFont } from '../formats/screenplay/fonts'
 import '../formats/screenplay/screenplay.css'
 
@@ -94,6 +96,8 @@ export function ScreenplayEditor({ zoom, onZoomChange }: ScreenplayEditorProps) 
   const [initialContent, setInitialContent] = useState(defaultContent)
   const [loaded, setLoaded] = useState(false)
   const [font, setFont] = useState<ScreenplayFont>(defaultFont)
+  const [titlePage, setTitlePage] = useState<TitlePageData>(defaultTitlePage)
+  const [navCollapsed, setNavCollapsed] = useState(false)
 
   useEffect(() => {
     load().then((saved) => {
@@ -108,7 +112,6 @@ export function ScreenplayEditor({ zoom, onZoomChange }: ScreenplayEditorProps) 
     {
       extensions: [
         StarterKit.configure({
-          // Disable nodes that conflict with our custom screenplay nodes
           heading: false,
           blockquote: false,
           codeBlock: false,
@@ -132,6 +135,8 @@ export function ScreenplayEditor({ zoom, onZoomChange }: ScreenplayEditorProps) 
     [loaded],
   )
 
+  const stats = useDocumentStats(editor)
+
   if (!loaded || !editor) {
     return (
       <div className="flex-1 flex items-center justify-center text-text-3">
@@ -141,17 +146,34 @@ export function ScreenplayEditor({ zoom, onZoomChange }: ScreenplayEditorProps) 
   }
 
   return (
-    <div className="flex flex-col flex-1">
-      <div className="sticky top-0 z-30 xl:relative">
-        <FormatToolbar editor={editor} font={font} onFontChange={setFont} zoom={zoom} onZoomChange={onZoomChange} />
+    <div className="flex flex-col flex-1 min-h-0">
+      <div className="sticky top-0 z-30">
+        <FormatToolbar
+          editor={editor}
+          font={font}
+          onFontChange={setFont}
+          zoom={zoom}
+          onZoomChange={onZoomChange}
+          wordCount={stats.wordCount}
+          pageCount={stats.pageCount}
+          runtime={stats.runtime}
+        />
       </div>
-      <SideToolbar editor={editor} />
-      <div
-        className="screenplay-canvas"
-        style={{ '--screenplay-zoom': zoom, '--screenplay-font': font.family } as React.CSSProperties}
-      >
-        <div className="screenplay-page">
-          <EditorContent editor={editor} />
+      <div className="relative flex-1 min-h-0">
+        <SceneNavigator
+          editor={editor}
+          titlePage={titlePage}
+          collapsed={navCollapsed}
+          onToggle={() => setNavCollapsed(!navCollapsed)}
+        />
+        <div
+          className="screenplay-canvas"
+          style={{ '--screenplay-zoom': zoom, '--screenplay-font': font.family } as React.CSSProperties}
+        >
+          <TitlePage data={titlePage} onChange={setTitlePage} />
+          <div className="screenplay-page">
+            <EditorContent editor={editor} />
+          </div>
         </div>
       </div>
       <FormatContextMenu editor={editor} />
