@@ -9,14 +9,14 @@
  * between pages with soft shadows on each edge.
  */
 
-/* The scrollable canvas — ONLY scroll container, always full width */
+/* The scrollable canvas — ONLY scroll container, fills remaining space */
 .screenplay-canvas {
   --screenplay-zoom: 1.25;
   --screenplay-font: "Courier Prime", "Courier New", Courier, monospace;
 
   background: #e8e6e1;
-  position: absolute;
-  inset: 0;
+  flex: 1;
+  min-width: 0;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 40px 0 80px;
@@ -40,6 +40,8 @@
   flex-shrink: 0;
   transform: scale(var(--screenplay-zoom));
   transform-origin: top center;
+  /* Compensate for scale overflow so layout gap works correctly */
+  margin-bottom: calc((var(--screenplay-zoom) - 1) * 1056px);
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.08),
     0 4px 16px rgba(0, 0, 0, 0.05);
@@ -119,6 +121,7 @@
   margin-top: 24px;
   margin-bottom: 12px;
   letter-spacing: 0.03em;
+  scroll-margin-top: 80px;
 }
 
 .screenplay-scene-heading:first-child {
@@ -190,6 +193,8 @@
   flex-shrink: 0;
   transform: scale(var(--screenplay-zoom));
   transform-origin: top center;
+  /* Compensate for scale overflow so layout gap works correctly */
+  margin-bottom: calc((var(--screenplay-zoom) - 1) * 1056px);
   padding: 1in;
   box-sizing: border-box;
   display: flex;
@@ -236,4 +241,25 @@
   font-size: 12pt;
   line-height: 1.5;
   text-align: right;
+}
+
+/*
+ * Scene flash — ProseMirror node decoration class applied to a
+ * scene heading when jumping to it from the navigator.
+ */
+@keyframes scene-glow {
+  0% {
+    background-color: rgba(61, 90, 128, 0.18);
+  }
+  50% {
+    background-color: rgba(61, 90, 128, 0.10);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.scene-flash {
+  animation: scene-glow 2.5s ease-out forwards;
+  border-radius: 3px;
 }
