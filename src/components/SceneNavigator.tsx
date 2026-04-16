@@ -125,7 +125,7 @@ export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNaviga
           <button
             onClick={onClose}
             aria-label="Close scene navigator"
-            className="p-1 rounded text-text-3 hover:text-text-1 hover:bg-surface-3 cursor-pointer transition-colors"
+            className="p-1 rounded text-text-3 hover:text-text-1 hover:bg-border-1/30 cursor-pointer transition-colors"
           >
             <PanelLeft size={14} />
           </button>
@@ -137,11 +137,11 @@ export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNaviga
           onClick={scrollToTop}
           className={`w-full text-left px-3 py-2 flex items-start gap-2 text-xs transition-colors cursor-pointer group ${
             activePos === -1
-              ? 'bg-border-1/50 border-l-2 border-accent'
-              : 'hover:bg-surface-2 border-l-2 border-transparent'
+              ? 'bg-border-1/60'
+              : 'hover:bg-border-1/30'
           }`}
         >
-          <FileText size={12} className={`shrink-0 mt-px ${activePos === -1 ? 'text-accent' : 'text-accent/40'}`} />
+          <FileText size={14} className="shrink-0 mt-px text-text-3" />
           <span className={`truncate leading-snug font-semibold ${activePos === -1 ? 'text-text-1' : 'text-text-2 group-hover:text-text-1'}`}>
             {(titlePage.title || 'Title Page').toUpperCase()}
           </span>
@@ -160,8 +160,8 @@ export function SceneNavigator({ editor, titlePage, open, onClose }: SceneNaviga
                 onClick={() => jumpToScene(scene.pos)}
                 className={`w-full text-left px-3 py-2 flex items-start gap-2 text-xs transition-colors cursor-pointer group ${
                   isActive
-                    ? 'bg-border-1/50 border-l-2 border-accent'
-                    : 'hover:bg-surface-2 border-l-2 border-transparent'
+                    ? 'bg-border-1/60'
+                    : 'hover:bg-border-1/30'
                 }`}
               >
                 <span className={`tabular-nums shrink-0 mt-px w-4 text-right ${isActive ? 'text-accent' : 'text-accent/40'}`}>

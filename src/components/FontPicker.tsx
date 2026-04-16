@@ -16,7 +16,7 @@ export function FontPicker({ selected, onSelect }: FontPickerProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer text-text-2 hover:bg-surface-3 hover:text-text-1 w-auto md:w-[160px]" title={selected.name}>
+        <button className="flex items-center gap-2 px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer text-text-2 hover:bg-border-1/50 hover:text-text-1 w-auto md:w-[160px]" title={selected.name}>
           <span style={{ fontFamily: selected.family }} className="text-sm shrink-0">
             Aa
           </span>

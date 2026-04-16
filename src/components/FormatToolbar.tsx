@@ -56,7 +56,7 @@ export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, 
           className={`p-1.5 rounded-md transition-colors cursor-pointer ${
             navOpen
               ? 'bg-border-1 text-text-1'
-              : 'text-text-2 hover:bg-surface-3 hover:text-text-1'
+              : 'text-text-2 hover:bg-border-1/50 hover:text-text-1'
           }`}
         >
           <PanelLeft size={16} />
@@ -69,7 +69,7 @@ export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, 
           onClick={() => editor.chain().focus().undo().run()}
           disabled={!editor.can().undo()}
           aria-label="Undo"
-          className="p-1.5 rounded-md transition-colors cursor-pointer text-text-2 hover:bg-surface-3 hover:text-text-1 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="p-1.5 rounded-md transition-colors cursor-pointer text-text-2 hover:bg-border-1/50 hover:text-text-1 disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <Undo2 size={15} />
         </button>
@@ -79,7 +79,7 @@ export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, 
           onClick={() => editor.chain().focus().redo().run()}
           disabled={!editor.can().redo()}
           aria-label="Redo"
-          className="p-1.5 rounded-md transition-colors cursor-pointer text-text-2 hover:bg-surface-3 hover:text-text-1 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="p-1.5 rounded-md transition-colors cursor-pointer text-text-2 hover:bg-border-1/50 hover:text-text-1 disabled:opacity-30 disabled:cursor-not-allowed"
         >
           <Redo2 size={15} />
         </button>
@@ -99,7 +99,7 @@ export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, 
                 className={`flex items-center gap-1.5 px-2 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer ${
                   isActive
                     ? 'bg-border-1 text-text-1'
-                    : 'text-text-2 hover:bg-surface-3 hover:text-text-1'
+                    : 'text-text-2 hover:bg-border-1/50 hover:text-text-1'
                 }`}
               >
                 <Icon size={14} />
@@ -112,19 +112,19 @@ export function FormatToolbar({ editor, font, onFontChange, zoom, onZoomChange, 
       <div className="ml-auto flex items-center gap-2">
         <div className="hidden sm:flex items-center gap-0.5 text-xs tabular-nums">
           <Tooltip content={`${wordCount.toLocaleString()} total words`}>
-            <span className="text-text-2 cursor-default px-1.5 py-0.5 rounded hover:bg-surface-3 transition-colors">
+            <span className="text-text-2 cursor-default px-1.5 py-0.5 rounded hover:bg-border-1/50 transition-colors">
               {wordCount.toLocaleString()} <span className="text-text-3">words</span>
             </span>
           </Tooltip>
           <span className="text-text-3">/</span>
           <Tooltip content={`${pageCount} ${pageCount === 1 ? 'page' : 'pages'}`}>
-            <span className="text-text-2 cursor-default px-1.5 py-0.5 rounded hover:bg-surface-3 transition-colors">
+            <span className="text-text-2 cursor-default px-1.5 py-0.5 rounded hover:bg-border-1/50 transition-colors">
               {pageCount} <span className="text-text-3">{pageCount === 1 ? 'pg' : 'pgs'}</span>
             </span>
           </Tooltip>
           <span className="text-text-3">/</span>
           <Tooltip content="Screen time">
-            <span className="text-text-2 cursor-default px-1.5 py-0.5 rounded hover:bg-surface-3 transition-colors">
+            <span className="text-text-2 cursor-default px-1.5 py-0.5 rounded hover:bg-border-1/50 transition-colors">
               {runtime}
             </span>
           </Tooltip>

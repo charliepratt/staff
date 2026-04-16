@@ -98,7 +98,7 @@ export function KeyboardShortcuts() {
         <button
           onClick={() => setOpen(true)}
           aria-label="Keyboard shortcuts"
-          className="p-1.5 rounded text-text-3 hover:text-text-1 hover:bg-surface-2 cursor-pointer transition-colors"
+          className="p-1.5 rounded text-text-3 hover:text-text-1 hover:bg-border-1/50 cursor-pointer transition-colors"
         >
           <Keyboard size={16} />
         </button>
@@ -116,7 +116,7 @@ export function KeyboardShortcuts() {
               <button
                 onClick={handleClose}
                 aria-label="Close shortcuts"
-                className="p-1.5 rounded text-text-3 hover:text-text-1 hover:bg-surface-2 cursor-pointer transition-colors"
+                className="p-1.5 rounded text-text-3 hover:text-text-1 hover:bg-border-1/50 cursor-pointer transition-colors"
               >
                 <X size={16} />
               </button>
